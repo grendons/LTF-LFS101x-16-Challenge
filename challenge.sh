@@ -19,7 +19,8 @@ until [ $filesize -ge 1048576 ]; do
 	# random chars to outputrandom file.
 	echo `cat /dev/urandom | tr -cd a-zA-Z0-9 | head -c15` | tee -a outputrandom
 	# Get the file size in bytes before the append to check if it is greather or equal to 1MB
-	filesize=$((A+16))
+	filesize=$((filesize+16))
+	echo $filesize
 	#filesize=`du -b test | awk {'print $1'}`
 done
 
@@ -28,4 +29,13 @@ done
 # letters from A to Z in upper case and later in lower case. With option -f can
 # ignore the case.
 sort outputrandom -o outputrandom
+
+# --4--
+# With sed we can filter each line that starts with 'a' or 'A' and delete it
+# and saves the output in a new file.
+# ^a	start the line with character 'a'
+# I	ignore the case of a, also can be 'A'
+# d	deletes the line of occurence
+sed '/^a/Id;w outputrandomfiltered' outputrandom
+
 
