@@ -17,11 +17,9 @@ until [ $filesize -ge 1048576 ]; do
 	# the filter of only characters from a-z, A-Z and 0-9 characters, with head
 	# up to 15 bytes, every character is a byte and tee apprends write the 15
 	# random chars to outputrandom file.
-	echo `cat /dev/urandom | tr -cd a-zA-Z0-9 | head -c15` | tee -a outputrandom
+	echo `cat /dev/urandom | tr -cd a-zA-Z0-9 | head -c15` >> outputrandom
 	# Get the file size in bytes before the append to check if it is greather or equal to 1MB
-	filesize=$((filesize+16))
-	echo $filesize
-	#filesize=`du -b test | awk {'print $1'}`
+	filesize=`du -b outputrandom | awk {'print $1'}`
 done
 
 # --3--
@@ -36,6 +34,12 @@ sort outputrandom -o outputrandom
 # ^a	start the line with character 'a'
 # I	ignore the case of a, also can be 'A'
 # d	deletes the line of occurence
-sed '/^a/Id;w outputrandomfiltered' outputrandom
+sed -n '/^a/Id;w outputrandomfiltered' outputrandom
 
-
+# --5--
+# wc -l gets the number of lines for original file and filtered file and print
+# out the result.
+file1lines=`wc -l < outputrandom`
+file2lines=`wc -l < outputrandomfiltered`
+filteredlines=$((file1lines-file2lines))
+echo '<'$filteredlines'> lines were removed.'
